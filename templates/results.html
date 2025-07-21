@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Text Extraction Results</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .file-result { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { border-left: 4px solid #4CAF50; background-color: #f9fff9; }
+        .error { border-left: 4px solid #f44336; background-color: #fff9f9; }
+        .filename { font-weight: bold; font-size: 1.2em; margin-bottom: 10px; color: #333; }
+        .extracted-text { 
+            background-color: #f5f5f5; 
+            padding: 15px; 
+            border-radius: 3px; 
+            white-space: pre-wrap; 
+            max-height: 400px; 
+            overflow-y: auto; 
+            font-family: 'Courier New', monospace; 
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .error-message { color: #d32f2f; font-weight: bold; }
+        .stats { color: #666; font-size: 0.9em; margin-top: 10px; }
+        .upload-more { 
+            text-align: center; 
+            margin: 30px 0; 
+            padding: 20px; 
+            background-color: #f0f0f0; 
+            border-radius: 5px; 
+        }
+        .upload-more a { 
+            background-color: #007bff; 
+            color: white; 
+            padding: 10px 20px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+        }
+        .summary { 
+            background-color: #e3f2fd; 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin-bottom: 20px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PDF Text Extraction Results</h1>
+        
+        <div class="summary">
+            <strong>Processing Summary:</strong> 
+            {{ extracted_texts.keys()|length }} file(s) processed
+            {% set successful = extracted_texts.values()|selectattr('1', 'undefined')|list|length %}
+            ({{ successful }} successful, {{ extracted_texts.keys()|length - successful }} failed)
+        </div>
+
+        {% for filename in extracted_texts.keys() %}
+            {% if extracted_texts[filename]|length == 1 %}
+                <div class="file-result success">
+                    <div class="filename">✅ {{ filename }}</div>
+                    <div class="extracted-text">{{ extracted_texts[filename][0] }}</div>
+                    <div class="stats">
+                        Characters: {{ extracted_texts[filename][0]|length }} | 
+                        Words: {{ extracted_texts[filename][0].split()|length }} | 
+                        Lines: {{ extracted_texts[filename][0].split('\n')|length }}
+                    </div>
+                </div>
+            {% else %}
+                <div class="file-result error">
+                    <div class="filename">❌ {{ filename }}</div>
+                    <div class="error-message">ERROR: {{ extracted_texts[filename][0] }}</div>
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        <div class="upload-more">
+            <a href="/">Upload More Files</a>
+        </div>
+    </div>
+</body>
+</html>
